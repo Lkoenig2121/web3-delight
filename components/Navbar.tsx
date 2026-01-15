@@ -92,6 +92,12 @@ export default function Navbar({
                       }
                       alt={user?.username}
                       className="w-8 h-8 rounded-full border-2 border-neon-cyan"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+                          user?.username || "default"
+                        )}`;
+                      }}
                     />
                     <span className="text-white hidden sm:block">
                       {user?.username}
@@ -109,7 +115,7 @@ export default function Navbar({
               </>
             ) : (
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onLoginClick}
                 className="px-6 py-2 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all duration-300"

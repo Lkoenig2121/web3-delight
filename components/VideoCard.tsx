@@ -28,6 +28,15 @@ export default function VideoCard({ video, onClick }: VideoCardProps) {
             src={video.thumbnail}
             alt={video.title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            loading="lazy"
+            crossOrigin="anonymous"
+            onError={(e) => {
+              // Fallback to a placeholder if image fails to load
+              const target = e.target as HTMLImageElement;
+              if (!target.src.includes('placeholder')) {
+                target.src = `https://via.placeholder.com/800x450/1a0033/00f0ff?text=${encodeURIComponent(video.title)}`;
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -54,6 +63,14 @@ export default function VideoCard({ video, onClick }: VideoCardProps) {
               src={video.avatar}
               alt={video.creator}
               className="w-10 h-10 rounded-full border-2 border-neon-cyan/50 flex-shrink-0 hover:border-neon-cyan transition-colors cursor-pointer"
+              loading="lazy"
+              onError={(e) => {
+                // Fallback to a default avatar if image fails to load
+                const target = e.target as HTMLImageElement;
+                if (!target.src.includes('dicebear')) {
+                  target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(video.creator)}`;
+                }
+              }}
             />
           </Link>
           <div className="flex-1 min-w-0">

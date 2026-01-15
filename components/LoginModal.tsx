@@ -78,12 +78,14 @@ export default function LoginModal({ onClose, onLogin }: LoginModalProps) {
           onClick={(e) => e.stopPropagation()}
           className="glass-dark rounded-2xl p-8 max-w-md w-full border border-white/20 relative"
         >
-          <button
+          <motion.button
             onClick={onClose}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
           >
             <FiX size={24} />
-          </button>
+          </motion.button>
 
           <h2 className="text-3xl font-bold text-white mb-2">
             {isLogin ? 'Welcome Back' : 'Create Account'}
@@ -163,8 +165,8 @@ export default function LoginModal({ onClose, onLogin }: LoginModalProps) {
 
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all disabled:opacity-50"
             >
@@ -173,17 +175,19 @@ export default function LoginModal({ onClose, onLogin }: LoginModalProps) {
           </form>
 
           <div className="mt-6 text-center">
-            <button
+            <motion.button
               onClick={() => {
                 setIsLogin(!isLogin)
                 setError('')
               }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
               className="text-neon-cyan hover:text-neon-purple transition-colors text-sm"
             >
               {isLogin
                 ? "Don't have an account? Sign up"
                 : 'Already have an account? Sign in'}
-            </button>
+            </motion.button>
           </div>
         </motion.div>
       </motion.div>

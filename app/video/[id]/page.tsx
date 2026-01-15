@@ -19,12 +19,14 @@ export default function VideoPage() {
       <div className="min-h-screen animated-bg flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-4">Video Not Found</h1>
-          <button
+          <motion.button
             onClick={() => router.push('/')}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
             className="px-6 py-3 bg-neon-cyan rounded-lg text-black font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
           >
             Go Home
-          </button>
+          </motion.button>
         </div>
       </div>
     )
@@ -95,7 +97,7 @@ export default function VideoPage() {
 
                 <div className="flex items-center gap-4">
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-2 glass px-4 py-2 rounded-lg text-white hover:text-neon-cyan transition-colors"
                   >
@@ -103,7 +105,7 @@ export default function VideoPage() {
                     <span>{video.likes}</span>
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className="flex items-center gap-2 glass px-4 py-2 rounded-lg text-white hover:text-neon-cyan transition-colors"
                   >
@@ -111,7 +113,7 @@ export default function VideoPage() {
                     <span>Share</span>
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className="glass p-2 rounded-lg text-white hover:text-neon-cyan transition-colors"
                   >
@@ -130,13 +132,17 @@ export default function VideoPage() {
                     src={video.avatar}
                     alt={video.creator}
                     className="w-16 h-16 rounded-full border-2 border-neon-cyan/50"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(video.creator)}`;
+                    }}
                   />
                   <div className="flex-1">
                     <h3 className="text-white font-semibold text-lg">{video.creator}</h3>
                     <p className="text-gray-400 text-sm">Web3 Content Creator</p>
                   </div>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-6 py-2 bg-neon-cyan rounded-lg text-black font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
                   >

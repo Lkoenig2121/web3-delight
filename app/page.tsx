@@ -11,11 +11,13 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { scrollY } = useScroll();
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const y = useTransform(scrollY, [0, 300], [0, -50]);
 
   useEffect(() => {
+    setIsMounted(true);
     const token = localStorage.getItem("token");
     if (token) {
       fetch("/api/auth/me", {
@@ -52,18 +54,26 @@ export default function Home() {
   return (
     <main className="min-h-screen animated-bg relative overflow-hidden">
       {/* Animated background particles */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {typeof window !== "undefined" &&
-          [...Array(20)].map((_, i) => (
+      {isMounted && (
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-neon-cyan rounded-full"
               initial={{
-                x: Math.random() * (window.innerWidth || 1920),
-                y: Math.random() * (window.innerHeight || 1080),
+                x:
+                  Math.random() *
+                  (typeof window !== "undefined" ? window.innerWidth : 1920),
+                y:
+                  Math.random() *
+                  (typeof window !== "undefined" ? window.innerHeight : 1080),
               }}
               animate={{
-                y: [null, Math.random() * (window.innerHeight || 1080)],
+                y: [
+                  null,
+                  Math.random() *
+                    (typeof window !== "undefined" ? window.innerHeight : 1080),
+                ],
                 opacity: [0.3, 0.8, 0.3],
               }}
               transition={{
@@ -73,7 +83,8 @@ export default function Home() {
               }}
             />
           ))}
-      </div>
+        </div>
+      )}
 
       <Navbar
         isLoggedIn={isLoggedIn}

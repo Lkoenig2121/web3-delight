@@ -20,12 +20,14 @@ export default function ProfilePage() {
       <div className="min-h-screen animated-bg flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-4">User Not Found</h1>
-          <button
+          <motion.button
             onClick={() => router.push('/')}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
             className="px-6 py-3 bg-neon-cyan rounded-lg text-black font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
           >
             Go Home
-          </button>
+          </motion.button>
         </div>
       </div>
     )
@@ -73,6 +75,10 @@ export default function ProfilePage() {
                 src={profile.avatar}
                 alt={profile.displayName}
                 className="w-32 h-32 rounded-full border-4 border-neon-cyan/50"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.username)}`;
+                }}
               />
               <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-neon-cyan rounded-full border-4 border-black flex items-center justify-center">
                 <div className="w-3 h-3 bg-black rounded-full" />
@@ -148,7 +154,7 @@ export default function ProfilePage() {
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="px-8 py-3 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
             >

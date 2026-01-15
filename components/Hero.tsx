@@ -71,7 +71,7 @@ export default function Hero() {
         >
           <motion.button
             onClick={scrollToVideos}
-            whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 240, 255, 0.5)" }}
+            whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0, 240, 255, 0.5)" }}
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold text-lg flex items-center gap-2 glass border border-neon-cyan/50"
           >
@@ -79,7 +79,7 @@ export default function Hero() {
             Start Watching
           </motion.button>
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 glass rounded-lg text-white font-semibold text-lg border border-white/20 hover:border-neon-cyan/50 transition-all"
           >
@@ -104,7 +104,7 @@ export default function Hero() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-              whileHover={{ scale: 1.1, y: -10 }}
+              whileHover={{ scale: 1.15, y: -10 }}
               className="glass p-6 rounded-xl border border-white/10 hover:border-neon-cyan/50 transition-all cursor-pointer"
             >
               <stat.icon className={`${stat.color} mx-auto mb-4`} size={32} />
