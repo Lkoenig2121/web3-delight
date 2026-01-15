@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { FiPlay, FiTrendingUp, FiUsers } from 'react-icons/fi'
+import { motion } from "framer-motion";
+import { FiPlay, FiTrendingUp, FiUsers } from "react-icons/fi";
 
 export default function Hero() {
   const scrollToVideos = () => {
-    const videosSection = document.getElementById('trending-videos')
+    const videosSection = document.getElementById("trending-videos");
     if (videosSection) {
-      videosSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      videosSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }
+  };
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-16">
       {/* Animated gradient orbs */}
@@ -49,7 +49,7 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="text-6xl md:text-8xl font-bold mb-6"
         >
-          <span className="neon-cyan">Web3</span>{' '}
+          <span className="neon-cyan">Web3</span>{" "}
           <span className="text-white">Delight</span>
         </motion.h1>
 
@@ -59,8 +59,8 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto"
         >
-          Experience the future of decentralized video streaming. 
-          Watch, create, and share content on the blockchain.
+          Experience the future of decentralized video streaming. Watch, create,
+          and share content on the blockchain.
         </motion.p>
 
         <motion.div
@@ -71,7 +71,10 @@ export default function Hero() {
         >
           <motion.button
             onClick={scrollToVideos}
-            whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(0, 240, 255, 0.5)" }}
+            whileHover={{
+              scale: 1.1,
+              boxShadow: "0 0 30px rgba(0, 240, 255, 0.5)",
+            }}
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold text-lg flex items-center gap-2 glass border border-neon-cyan/50"
           >
@@ -95,16 +98,35 @@ export default function Hero() {
           className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
         >
           {[
-            { icon: FiPlay, label: 'Videos', value: '10K+', color: 'text-neon-cyan' },
-            { icon: FiUsers, label: 'Creators', value: '500+', color: 'text-neon-purple' },
-            { icon: FiTrendingUp, label: 'Views', value: '1M+', color: 'text-neon-pink' },
+            {
+              icon: FiPlay,
+              label: "Videos",
+              value: "10K+",
+              color: "text-neon-cyan",
+            },
+            {
+              icon: FiUsers,
+              label: "Creators",
+              value: "500+",
+              color: "text-neon-purple",
+            },
+            {
+              icon: FiTrendingUp,
+              label: "Views",
+              value: "1M+",
+              color: "text-neon-pink",
+            },
           ].map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-              whileHover={{ scale: 1.15, y: -10 }}
+              whileHover={{
+                scale: 1.15,
+                y: -10,
+                transition: { duration: 0.2, ease: "easeOut" },
+              }}
               className="glass p-6 rounded-xl border border-white/10 hover:border-neon-cyan/50 transition-all cursor-pointer"
             >
               <stat.icon className={`${stat.color} mx-auto mb-4`} size={32} />
@@ -117,6 +139,5 @@ export default function Hero() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
-
