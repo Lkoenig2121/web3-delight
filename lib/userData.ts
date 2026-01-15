@@ -18,8 +18,22 @@ export interface UserProfile {
 
 export const userProfiles: UserProfile[] = [
   {
+    id: 'web3user',
+    username: 'web3user',
+    displayName: 'Web3 User',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=web3user',
+    bio: 'Passionate Web3 enthusiast exploring the decentralized future. Learning and sharing knowledge about blockchain, DeFi, and NFTs.',
+    subscribers: '12.5K',
+    videos: 5,
+    totalViews: '450K',
+    joinDate: 'December 2023',
+    socialLinks: {
+      twitter: '@web3user',
+    },
+  },
+  {
     id: 'cryptodev',
-    username: 'CryptoDev',
+    username: 'cryptodev',
     displayName: 'Crypto Dev',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CryptoDev',
     bio: 'Web3 developer passionate about blockchain technology and decentralized applications. Sharing knowledge and building the future of the internet.',

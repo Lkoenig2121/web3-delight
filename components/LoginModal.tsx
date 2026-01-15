@@ -98,10 +98,34 @@ export default function LoginModal({ onClose, onLogin }: LoginModalProps) {
 
           {/* Demo Account Info */}
           <div className="mb-6 p-4 glass rounded-lg border border-neon-cyan/30">
-            <p className="text-neon-cyan text-sm font-semibold mb-2">Demo Accounts:</p>
-            <div className="text-gray-300 text-xs space-y-1">
-              <p>Email: user@web3delight.com | Password: web3pass</p>
-              <p>Email: dev@web3delight.com | Password: web3pass</p>
+            <p className="text-neon-cyan text-sm font-semibold mb-3">Demo Accounts:</p>
+            <div className="flex flex-col gap-2">
+              <motion.button
+                type="button"
+                onClick={() => {
+                  setEmail('user@web3delight.com')
+                  setPassword('web3pass')
+                  setError('')
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full px-4 py-2 glass rounded-lg text-white text-sm border border-neon-cyan/50 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all text-left"
+              >
+                <span className="text-neon-cyan font-semibold">Click to fill:</span> user@web3delight.com
+              </motion.button>
+              <motion.button
+                type="button"
+                onClick={() => {
+                  setEmail('dev@web3delight.com')
+                  setPassword('web3pass')
+                  setError('')
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full px-4 py-2 glass rounded-lg text-white text-sm border border-neon-cyan/50 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all text-left"
+              >
+                <span className="text-neon-cyan font-semibold">Click to fill:</span> dev@web3delight.com
+              </motion.button>
             </div>
           </div>
 

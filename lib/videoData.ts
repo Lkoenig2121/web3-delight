@@ -119,6 +119,32 @@ export const videos: Video[] = [
     likes: '11.7K',
     uploadDate: '2 weeks ago',
   },
+  {
+    id: 9,
+    title: 'Getting Started with Web3',
+    creator: 'web3user',
+    creatorId: 'web3user',
+    thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80',
+    views: '45K',
+    duration: '10:15',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=web3user',
+    description: 'A beginner-friendly introduction to Web3 concepts and how to get started in the decentralized web.',
+    likes: '3.2K',
+    uploadDate: '1 week ago',
+  },
+  {
+    id: 10,
+    title: 'Understanding Blockchain Basics',
+    creator: 'web3user',
+    creatorId: 'web3user',
+    thumbnail: 'https://images.unsplash.com/photo-1639322537504-6427a16b0a28?w=800&q=80',
+    views: '38K',
+    duration: '14:22',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=web3user',
+    description: 'Learn the fundamental concepts of blockchain technology in an easy-to-understand way.',
+    likes: '2.8K',
+    uploadDate: '2 weeks ago',
+  },
 ]
 
 export function getVideoById(id: number): Video | undefined {
