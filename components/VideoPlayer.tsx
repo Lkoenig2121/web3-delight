@@ -180,3 +180,4 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
   )
 }
 
+

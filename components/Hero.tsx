@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FiPlay, FiTrendingUp, FiUsers } from "react-icons/fi";
+import Link from "next/link";
 
 export default function Hero() {
   const scrollToVideos = () => {
@@ -81,13 +82,15 @@ export default function Hero() {
             <FiPlay size={24} />
             Start Watching
           </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 glass rounded-lg text-white font-semibold text-lg border border-white/20 hover:border-neon-cyan/50 transition-all"
-          >
-            Learn More
-          </motion.button>
+          <Link href="/about">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 glass rounded-lg text-white font-semibold text-lg border border-white/20 hover:border-neon-cyan/50 transition-all"
+            >
+              Learn More
+            </motion.button>
+          </Link>
         </motion.div>
 
         {/* Stats */}
