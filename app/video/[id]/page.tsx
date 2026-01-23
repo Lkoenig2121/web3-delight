@@ -1,8 +1,8 @@
 'use client'
 
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { FiArrowLeft, FiThumbsUp, FiShare2, FiMoreVertical, FiClock } from 'react-icons/fi'
+import { FiThumbsUp, FiShare2, FiMoreVertical } from 'react-icons/fi'
 import { getVideoById, videos } from '@/lib/videoData'
 import VideoPlayer from '@/components/VideoPlayer'
 import VideoCard from '@/components/VideoCard'
@@ -10,7 +10,6 @@ import Link from 'next/link'
 
 export default function VideoPage() {
   const params = useParams()
-  const router = useRouter()
   const videoId = parseInt(params.id as string)
   const video = getVideoById(videoId)
 
@@ -19,14 +18,15 @@ export default function VideoPage() {
       <div className="min-h-screen animated-bg flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-4">Video Not Found</h1>
-          <motion.button
-            onClick={() => router.push('/')}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-neon-cyan rounded-lg text-black font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
-          >
-            Go Home
-          </motion.button>
+          <Link href="/">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 bg-neon-cyan rounded-lg text-black font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
+            >
+              Go Home
+            </motion.button>
+          </Link>
         </div>
       </div>
     )
@@ -45,16 +45,19 @@ export default function VideoPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-white hover:text-neon-cyan transition-colors"
-            >
-              <FiArrowLeft size={24} />
-              <span>Back</span>
-            </motion.button>
-            <h1 className="text-xl font-bold neon-cyan">Web3 Delight</h1>
+            <Link href="/">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <div className="w-8 h-8 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">W3</span>
+                </div>
+                <span className="text-white font-bold text-xl neon-cyan">
+                  Web3 Delight
+                </span>
+              </motion.div>
+            </Link>
             <div className="w-20" /> {/* Spacer */}
           </div>
         </div>
