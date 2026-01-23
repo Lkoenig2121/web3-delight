@@ -1,17 +1,56 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { FiThumbsUp, FiShare2, FiMoreVertical } from 'react-icons/fi'
+import { FiThumbsUp, FiShare2, FiMoreVertical, FiLogOut } from 'react-icons/fi'
 import { getVideoById, videos } from '@/lib/videoData'
 import VideoPlayer from '@/components/VideoPlayer'
 import VideoCard from '@/components/VideoCard'
+import LoginModal from '@/components/LoginModal'
 import Link from 'next/link'
 
 export default function VideoPage() {
   const params = useParams()
   const videoId = parseInt(params.id as string)
   const video = getVideoById(videoId)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [showLogin, setShowLogin] = useState(false)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      fetch('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.id) {
+            setIsLoggedIn(true)
+            setUser(data)
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('token')
+        })
+    }
+  }, [])
+
+  const handleLogin = (token: string, userData: any) => {
+    localStorage.setItem('token', token)
+    setIsLoggedIn(true)
+    setUser(userData)
+    setShowLogin(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    setIsLoggedIn(false)
+    setUser(null)
+  }
 
   if (!video) {
     return (
@@ -58,7 +97,57 @@ export default function VideoPage() {
                 </span>
               </motion.div>
             </Link>
-            <div className="w-20" /> {/* Spacer */}
+            
+            {/* User Actions */}
+            <div className="flex items-center space-x-4">
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    href={`/profile/${user?.username?.toLowerCase() || "user"}`}
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      className="flex items-center space-x-2 cursor-pointer glass px-4 py-2 rounded-lg"
+                    >
+                      <img
+                        src={
+                          user?.avatar ||
+                          "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
+                        }
+                        alt={user?.username}
+                        className="w-8 h-8 rounded-full border-2 border-neon-cyan"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+                            user?.username || "default"
+                          )}`;
+                        }}
+                      />
+                      <span className="text-white hidden sm:block">
+                        {user?.username}
+                      </span>
+                    </motion.div>
+                  </Link>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleLogout}
+                    className="p-2 glass rounded-lg text-white hover:text-neon-cyan transition-colors"
+                  >
+                    <FiLogOut size={20} />
+                  </motion.button>
+                </>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowLogin(true)}
+                  className="px-6 py-2 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all duration-300"
+                >
+                  Sign In
+                </motion.button>
+              )}
+            </div>
           </div>
         </div>
       </motion.nav>
@@ -178,6 +267,10 @@ export default function VideoPage() {
           </div>
         </div>
       </div>
+
+      {showLogin && (
+        <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />
+      )}
     </main>
   )
 }
