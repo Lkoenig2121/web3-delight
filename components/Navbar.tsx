@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { FiSearch, FiMenu, FiUser, FiLogOut, FiX } from "react-icons/fi";
+import { FiSearch, FiMenu, FiUser, FiLogOut, FiX, FiPlay } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { videos } from "@/lib/videoData";
@@ -24,6 +24,7 @@ export default function Navbar({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   // Handle search
@@ -83,6 +84,18 @@ export default function Navbar({
               </span>
             </motion.div>
           </Link>
+
+          {/* Navigation Links - Desktop Only */}
+          {isLoggedIn && (
+            <Link href="/subscriptions">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                className="hidden md:block ml-6 px-4 py-2 glass rounded-lg text-white hover:text-neon-cyan transition-colors text-sm font-semibold"
+              >
+                Subscriptions
+              </motion.button>
+            </Link>
+          )}
 
           {/* Search Bar */}
           <motion.div
@@ -234,12 +247,79 @@ export default function Navbar({
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
               className="md:hidden p-2 glass rounded-lg text-white"
             >
-              <FiMenu size={20} />
+              {showMobileMenu ? <FiX size={20} /> : <FiMenu size={20} />}
             </motion.button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {showMobileMenu && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden border-t border-white/10 overflow-hidden"
+            >
+              <div className="px-4 py-4 space-y-2">
+                {isLoggedIn && (
+                  <Link href="/subscriptions" onClick={() => setShowMobileMenu(false)}>
+                    <motion.div
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      className="flex items-center gap-3 glass p-3 rounded-lg text-white hover:text-neon-cyan transition-colors cursor-pointer"
+                    >
+                      <FiPlay size={20} />
+                      <span className="font-semibold">Subscriptions</span>
+                    </motion.div>
+                  </Link>
+                )}
+                {isLoggedIn && (
+                  <Link
+                    href={`/profile/${user?.username?.toLowerCase() || "user"}`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <motion.div
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      className="flex items-center gap-3 glass p-3 rounded-lg text-white hover:text-neon-cyan transition-colors cursor-pointer"
+                    >
+                      <FiUser size={20} />
+                      <span className="font-semibold">My Profile</span>
+                    </motion.div>
+                  </Link>
+                )}
+                {isLoggedIn && (
+                  <motion.button
+                    onClick={() => {
+                      onLogout();
+                      setShowMobileMenu(false);
+                    }}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    className="w-full flex items-center gap-3 glass p-3 rounded-lg text-white hover:text-neon-cyan transition-colors"
+                  >
+                    <FiLogOut size={20} />
+                    <span className="font-semibold">Sign Out</span>
+                  </motion.button>
+                )}
+                {!isLoggedIn && (
+                  <motion.button
+                    onClick={() => {
+                      onLoginClick();
+                      setShowMobileMenu(false);
+                    }}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
+                  >
+                    Sign In
+                  </motion.button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   );

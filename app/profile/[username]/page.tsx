@@ -1,10 +1,12 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { FiArrowLeft, FiUsers, FiPlay, FiEye, FiCalendar, FiTwitter, FiGithub, FiGlobe } from 'react-icons/fi'
+import { FiUsers, FiPlay, FiEye, FiCalendar, FiTwitter, FiGithub, FiGlobe } from 'react-icons/fi'
 import { getUserProfile } from '@/lib/userData'
 import { getVideosByCreator } from '@/lib/videoData'
+import { isSubscribed, toggleSubscription } from '@/lib/subscriptionUtils'
 import VideoCard from '@/components/VideoCard'
 import Link from 'next/link'
 
@@ -14,6 +16,20 @@ export default function ProfilePage() {
   const username = params.username as string
   const profile = getUserProfile(username)
   const userVideos = profile ? getVideosByCreator(profile.id) : []
+  const [subscribed, setSubscribed] = useState(false)
+
+  useEffect(() => {
+    if (profile) {
+      setSubscribed(isSubscribed(profile.id))
+    }
+  }, [profile])
+
+  const handleSubscribe = () => {
+    if (profile) {
+      const newState = toggleSubscription(profile.id)
+      setSubscribed(newState)
+    }
+  }
 
   if (!profile) {
     return (
@@ -43,16 +59,19 @@ export default function ProfilePage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-white hover:text-neon-cyan transition-colors"
-            >
-              <FiArrowLeft size={24} />
-              <span>Back</span>
-            </motion.button>
-            <h1 className="text-xl font-bold neon-cyan">Web3 Delight</h1>
+            <Link href="/">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <div className="w-8 h-8 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">W3</span>
+                </div>
+                <span className="text-white font-bold text-xl neon-cyan">
+                  Web3 Delight
+                </span>
+              </motion.div>
+            </Link>
             <div className="w-20" /> {/* Spacer */}
           </div>
         </div>
@@ -154,11 +173,16 @@ export default function ProfilePage() {
             </div>
 
             <motion.button
+              onClick={handleSubscribe}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-lg text-white font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
+              className={`px-8 py-3 rounded-lg text-white font-semibold hover:shadow-lg transition-all ${
+                subscribed
+                  ? 'bg-gray-600 hover:bg-gray-700'
+                  : 'bg-gradient-to-r from-neon-cyan to-neon-purple hover:shadow-neon-cyan/50'
+              }`}
             >
-              Subscribe
+              {subscribed ? 'Subscribed' : 'Subscribe'}
             </motion.button>
           </div>
         </motion.div>

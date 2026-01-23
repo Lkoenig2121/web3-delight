@@ -10,6 +10,18 @@ interface VideoPlayerProps {
   title: string
 }
 
+// Extract YouTube video ID from URL
+function getYouTubeVideoId(url: string): string | null {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+  const match = url.match(regExp)
+  return match && match[2].length === 11 ? match[2] : null
+}
+
+// Check if URL is a YouTube URL
+function isYouTubeUrl(url: string): boolean {
+  return /youtube\.com|youtu\.be/.test(url)
+}
+
 export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
@@ -17,9 +29,15 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  // Check if it's a YouTube URL
+  const isYouTube = videoUrl && isYouTubeUrl(videoUrl)
+  const youtubeVideoId = videoUrl && isYouTube ? getYouTubeVideoId(videoUrl) : null
+  const embedUrl = youtubeVideoId ? `https://www.youtube.com/embed/${youtubeVideoId}?enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}` : null
 
   // For demo purposes, we'll use a placeholder video or the thumbnail
-  const actualVideoUrl = videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+  const actualVideoUrl = videoUrl && !isYouTube ? videoUrl : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
 
   useEffect(() => {
     const video = videoRef.current
@@ -70,6 +88,22 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // If YouTube URL, use iframe embed
+  if (isYouTube && embedUrl) {
+    return (
+      <div className="relative w-full aspect-video glass rounded-xl overflow-hidden border border-white/10">
+        <iframe
+          ref={iframeRef}
+          src={embedUrl}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title={title}
+        />
+      </div>
+    )
   }
 
   return (

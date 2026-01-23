@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FiThumbsUp, FiShare2, FiMoreVertical, FiLogOut } from 'react-icons/fi'
 import { getVideoById, videos } from '@/lib/videoData'
+import { isSubscribed, toggleSubscription } from '@/lib/subscriptionUtils'
 import VideoPlayer from '@/components/VideoPlayer'
 import VideoCard from '@/components/VideoCard'
 import LoginModal from '@/components/LoginModal'
@@ -17,6 +18,7 @@ export default function VideoPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [showLogin, setShowLogin] = useState(false)
+  const [subscribed, setSubscribed] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -50,6 +52,19 @@ export default function VideoPage() {
     localStorage.removeItem('token')
     setIsLoggedIn(false)
     setUser(null)
+  }
+
+  useEffect(() => {
+    if (video) {
+      setSubscribed(isSubscribed(video.creatorId))
+    }
+  }, [video])
+
+  const handleSubscribe = () => {
+    if (video) {
+      const newState = toggleSubscription(video.creatorId)
+      setSubscribed(newState)
+    }
   }
 
   if (!video) {
@@ -215,33 +230,44 @@ export default function VideoPage() {
               </div>
 
               {/* Creator Info */}
-              <Link href={`/profile/${video.creatorId}`}>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="flex items-center gap-4 glass p-4 rounded-lg border border-white/10 hover:border-neon-cyan/50 transition-all cursor-pointer"
-                >
-                  <img
-                    src={video.avatar}
-                    alt={video.creator}
-                    className="w-16 h-16 rounded-full border-2 border-neon-cyan/50"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(video.creator)}`;
-                    }}
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-white font-semibold text-lg">{video.creator}</h3>
-                    <p className="text-gray-400 text-sm">Web3 Content Creator</p>
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-2 bg-neon-cyan rounded-lg text-black font-semibold hover:shadow-lg hover:shadow-neon-cyan/50 transition-all"
+              <div className="flex items-center gap-4 glass p-4 rounded-lg border border-white/10">
+                <Link href={`/profile/${video.creatorId}`}>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="flex items-center gap-4 cursor-pointer"
                   >
-                    Subscribe
-                  </motion.button>
-                </motion.div>
-              </Link>
+                    <img
+                      src={video.avatar}
+                      alt={video.creator}
+                      className="w-16 h-16 rounded-full border-2 border-neon-cyan/50"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(video.creator)}`;
+                      }}
+                    />
+                    <div className="flex-1">
+                      <h3 className="text-white font-semibold text-lg hover:text-neon-cyan transition-colors">{video.creator}</h3>
+                      <p className="text-gray-400 text-sm">Web3 Content Creator</p>
+                    </div>
+                  </motion.div>
+                </Link>
+                <motion.button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleSubscribe()
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all ml-auto ${
+                    subscribed
+                      ? 'bg-gray-600 text-white hover:bg-gray-700'
+                      : 'bg-neon-cyan text-black hover:shadow-neon-cyan/50'
+                  }`}
+                >
+                  {subscribed ? 'Subscribed' : 'Subscribe'}
+                </motion.button>
+              </div>
 
               {/* Description */}
               <div className="mt-6 glass p-4 rounded-lg border border-white/10">
