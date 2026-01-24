@@ -8,6 +8,7 @@ import { getVideoById, videos } from '@/lib/videoData'
 import { isSubscribed, toggleSubscription } from '@/lib/subscriptionUtils'
 import VideoPlayer from '@/components/VideoPlayer'
 import VideoCard from '@/components/VideoCard'
+import Comments from '@/components/Comments'
 import LoginModal from '@/components/LoginModal'
 import Link from 'next/link'
 
@@ -273,6 +274,9 @@ export default function VideoPage() {
               <div className="mt-6 glass p-4 rounded-lg border border-white/10">
                 <p className="text-white leading-relaxed">{video.description}</p>
               </div>
+
+              {/* Comments Section */}
+              <Comments videoId={video.id} videoTitle={video.title} />
             </motion.div>
           </div>
 
