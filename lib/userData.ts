@@ -154,6 +154,54 @@ export const userProfiles: UserProfile[] = [
 ]
 
 export function getUserProfile(username: string): UserProfile | undefined {
-  return userProfiles.find(u => u.id === username || u.username.toLowerCase() === username.toLowerCase())
+  // Normalize the username for comparison
+  const normalizedInput = username.toLowerCase().replace(/\s+/g, '')
+  
+  // First check existing profiles
+  const existingProfile = userProfiles.find(u => {
+    const normalizedId = u.id.toLowerCase().replace(/\s+/g, '')
+    const normalizedUsername = u.username.toLowerCase().replace(/\s+/g, '')
+    return normalizedId === normalizedInput || normalizedUsername === normalizedInput
+  })
+  
+  if (existingProfile) return existingProfile
+  
+  // Generate a profile for comment authors that don't have one
+  // Use the input as-is for display, but normalize for ID
+  const usernameLower = normalizedInput
+  const displayName = username.replace(/([A-Z])/g, ' $1').trim() || username
+  
+  // Generate more realistic subscriber counts for regular commenters
+  // Most will have very few subscribers (0-500), some will have moderate (500-5K), few will have more
+  const subscriberRand = Math.random()
+  let subscribers: string
+  if (subscriberRand < 0.6) {
+    // 60% have 0-500 subscribers
+    const count = Math.floor(Math.random() * 500)
+    subscribers = count < 100 ? count.toString() : `${(count / 100).toFixed(1)}K`
+  } else if (subscriberRand < 0.9) {
+    // 30% have 500-5K subscribers
+    const count = Math.floor(Math.random() * 4500) + 500
+    subscribers = `${(count / 1000).toFixed(1)}K`
+  } else {
+    // 10% have 5K-20K subscribers
+    const count = Math.floor(Math.random() * 15000) + 5000
+    subscribers = `${(count / 1000).toFixed(1)}K`
+  }
+  
+  return {
+    id: usernameLower,
+    username: username,
+    displayName: displayName,
+    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`,
+    bio: `Web3 enthusiast and content creator. Passionate about blockchain technology and the decentralized web.`,
+    subscribers: subscribers,
+    videos: Math.floor(Math.random() * 10) + 1,
+    totalViews: `${Math.floor(Math.random() * 50) + 1}K`,
+    joinDate: new Date(2022 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 12)).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    socialLinks: {
+      twitter: `@${usernameLower}`,
+    },
+  }
 }
 
