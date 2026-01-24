@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValue } from "framer-motion";
+import { useState, useEffect } from "react";
 import VideoCard from "./VideoCard";
 import { getVideosByCategory, type VideoCategory } from "@/lib/videoData";
 
@@ -10,9 +10,25 @@ const categories: VideoCategory[] = ['All', 'Solidity', 'DeFi', 'NFTs', 'Securit
 export default function VideoGrid() {
   const [selectedCategory, setSelectedCategory] = useState<VideoCategory>('All');
   const [videosToShow, setVideosToShow] = useState(20);
+  const [isMobile, setIsMobile] = useState(false);
   const { scrollYProgress } = useScroll();
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [0, 1, 1]);
-  const y = useTransform(scrollYProgress, [0, 0.3], [100, 0]);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Desktop scroll-based transforms
+  const desktopOpacity = useTransform(scrollYProgress, [0, 0.3, 1], [0, 1, 1]);
+  const desktopY = useTransform(scrollYProgress, [0, 0.3], [100, 0]);
+  
+  // Mobile: use constant motion values (no scroll animation)
+  const mobileOpacity = useMotionValue(1);
+  const mobileY = useMotionValue(0);
 
   const categoryVideos = getVideosByCategory(selectedCategory);
   const displayedVideos = categoryVideos.slice(0, videosToShow);
@@ -35,7 +51,7 @@ export default function VideoGrid() {
   return (
     <motion.section
       id="trending-videos"
-      style={{ opacity, y }}
+      style={isMobile ? { opacity: mobileOpacity, y: mobileY } : { opacity: desktopOpacity, y: desktopY }}
       className="relative py-16 md:py-20 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">

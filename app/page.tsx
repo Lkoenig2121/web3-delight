@@ -12,9 +12,25 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { scrollY } = useScroll();
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const y = useTransform(scrollY, [0, 300], [0, -50]);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Less aggressive fade on mobile - fade slower and less
+  const opacity = isMobile
+    ? useTransform(scrollY, [0, 500], [1, 0.7])
+    : useTransform(scrollY, [0, 300], [1, 0]);
+  const y = isMobile
+    ? useTransform(scrollY, [0, 500], [0, -30])
+    : useTransform(scrollY, [0, 300], [0, -50]);
 
   useEffect(() => {
     setIsMounted(true);
