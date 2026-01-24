@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FiLogOut, FiUser } from 'react-icons/fi'
-import { videos } from '@/lib/videoData'
+import { allVideos as videos } from '@/lib/videoData'
 import { getSubscriptions } from '@/lib/subscriptionUtils'
 import VideoCard from '@/components/VideoCard'
 import LoginModal from '@/components/LoginModal'

@@ -18,7 +18,7 @@ export interface Video {
 export type VideoCategory = 'All' | 'Solidity' | 'DeFi' | 'NFTs' | 'Security' | 'Layer 2' | 'Tools' | 'Advanced'
 
 export function getVideosByCategory(category: VideoCategory): Video[] {
-  if (category === 'All') return videos
+  if (category === 'All') return allVideos
   
   return videos.filter(video => {
     const title = video.title.toLowerCase()
@@ -944,11 +944,306 @@ export const videos: Video[] = [
   },
 ]
 
+// Generate additional videos programmatically to reach 10,000 total
+function generateAdditionalVideos(): Video[] {
+  const additionalVideos: Video[] = []
+  
+  // Creator video quotas based on their profiles
+  const creatorQuotas: { [key: string]: number } = {
+    'cryptodev': 12,
+    'blockchainmaster': 28,
+    'web3guru': 45,
+    'nftexpert': 19,
+    'defianalyst': 15,
+    'ethdeveloper': 52,
+    'securitypro': 23,
+    'polygonbuilder': 17,
+    'web3user': 5,
+  }
+  
+  // Count existing videos per creator
+  const existingCounts: { [key: string]: number } = {}
+  videos.forEach(video => {
+    existingCounts[video.creatorId] = (existingCounts[video.creatorId] || 0) + 1
+  })
+  
+  // Calculate how many more videos each creator needs
+  const creators = [
+    { name: 'CryptoDev', id: 'cryptodev', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CryptoDev' },
+    { name: 'BlockchainMaster', id: 'blockchainmaster', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BlockchainMaster' },
+    { name: 'Web3Guru', id: 'web3guru', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Web3Guru' },
+    { name: 'NFTExpert', id: 'nftexpert', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=NFTExpert' },
+    { name: 'DeFiAnalyst', id: 'defianalyst', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DeFiAnalyst' },
+    { name: 'EthDeveloper', id: 'ethdeveloper', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=EthDeveloper' },
+    { name: 'SecurityPro', id: 'securitypro', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SecurityPro' },
+    { name: 'PolygonBuilder', id: 'polygonbuilder', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=PolygonBuilder' },
+    { name: 'web3user', id: 'web3user', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=web3user' },
+  ]
+  
+  // Create a pool of creators with remaining video slots
+  const creatorPool: Array<{ name: string; id: string; avatar: string }> = []
+  creators.forEach(creator => {
+    const existing = existingCounts[creator.id] || 0
+    const quota = creatorQuotas[creator.id] || 0
+    const remaining = Math.max(0, quota - existing)
+    // Add creator to pool based on remaining slots (for proportional distribution)
+    for (let i = 0; i < remaining; i++) {
+      creatorPool.push(creator)
+    }
+  })
+  
+  // Calculate total remaining slots
+  const totalRemaining = creatorPool.length
+  const videosToGenerate = 10000 - videos.length
+  
+  // If we need more videos than remaining slots, distribute proportionally
+  if (videosToGenerate > totalRemaining) {
+    // Distribute extra videos proportionally based on creator quotas
+    const totalQuota = Object.values(creatorQuotas).reduce((sum, q) => sum + q, 0)
+    creators.forEach(creator => {
+      const quota = creatorQuotas[creator.id] || 0
+      const proportion = quota / totalQuota
+      const extraVideos = Math.floor((videosToGenerate - totalRemaining) * proportion)
+      for (let i = 0; i < extraVideos; i++) {
+        creatorPool.push(creator)
+      }
+    })
+  }
+
+  const videoTopics = [
+    // Solidity & Smart Contracts
+    'Solidity', 'Smart Contract', 'ERC-20', 'ERC-721', 'ERC-1155', 'Solidity Programming',
+    'Smart Contract Development', 'Contract Deployment', 'Solidity Basics', 'Advanced Solidity',
+    'Contract Testing', 'Contract Security', 'Gas Optimization', 'Solidity Patterns',
+    
+    // DeFi
+    'DeFi', 'Uniswap', 'Aave', 'Compound', 'MakerDAO', 'Yearn Finance', 'Curve Finance',
+    'Balancer', 'SushiSwap', 'Liquidity Pool', 'Yield Farming', 'Staking', 'Lending',
+    'Borrowing', 'Flash Loans', 'AMM', 'DEX',
+    
+    // NFTs
+    'NFT', 'NFT Minting', 'NFT Marketplace', 'OpenSea', 'Rarible', 'Generative Art',
+    'NFT Collection', 'NFT Metadata', 'IPFS', 'Royalties', 'NFT Staking',
+    
+    // Blockchain & Ethereum
+    'Ethereum', 'Blockchain', 'EVM', 'Consensus', 'Proof of Stake', 'Proof of Work',
+    'Merkle Tree', 'Hash Function', 'Block Structure', 'Transaction', 'Gas',
+    
+    // Layer 2
+    'Polygon', 'Arbitrum', 'Optimism', 'zkSync', 'StarkNet', 'Rollup', 'Sidechain',
+    'Layer 2', 'Scaling', 'L2 Solution',
+    
+    // Tools
+    'Hardhat', 'Truffle', 'Foundry', 'Remix', 'MetaMask', 'Web3.js', 'Ethers.js',
+    'The Graph', 'Alchemy', 'Infura', 'WalletConnect',
+    
+    // Security
+    'Security', 'Audit', 'Vulnerability', 'Reentrancy', 'Access Control', 'Smart Contract Audit',
+    
+    // Advanced
+    'DAO', 'Governance', 'Oracle', 'Chainlink', 'Bridge', 'Cross-chain', 'Tokenomics',
+    'Vesting', 'Multi-sig', 'Proxy', 'Factory Pattern',
+  ]
+
+  const thumbnails = [
+    'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80',
+    'https://images.unsplash.com/photo-1639322537504-6427a16b0a28?w=800&q=80',
+    'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=800&q=80',
+    'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=800&q=80',
+  ]
+
+  const uploadDates = ['1 day ago', '2 days ago', '3 days ago', '1 week ago', '2 weeks ago', '3 weeks ago', '1 month ago', '2 months ago', '3 months ago', '6 months ago', '1 year ago']
+
+  const descriptions = [
+    'Learn everything about {topic}. This comprehensive tutorial covers all the essential concepts and practical examples.',
+    'Master {topic} with this in-depth guide. Perfect for both beginners and experienced developers.',
+    'Complete walkthrough of {topic}. We\'ll cover theory, implementation, and best practices.',
+    'Understanding {topic} made easy. Step-by-step tutorial with real-world examples.',
+    'Deep dive into {topic}. Learn advanced techniques and industry best practices.',
+    'Get started with {topic} in this beginner-friendly tutorial.',
+    'Advanced {topic} concepts explained. Take your skills to the next level.',
+  ]
+
+  // Count existing videos per creator from the first 100
+  const creatorVideoCounts: { [key: string]: number } = {}
+  videos.forEach(video => {
+    creatorVideoCounts[video.creatorId] = (creatorVideoCounts[video.creatorId] || 0) + 1
+  })
+  
+  // Generate videos for existing creators up to their quota, then create new creators
+  let videoId = 101
+  const newCreators: Array<{ name: string; id: string; avatar: string }> = []
+  
+  // First, fill up existing creators to their quotas
+  creators.forEach(creator => {
+    const existing = creatorVideoCounts[creator.id] || 0
+    const quota = creatorQuotas[creator.id] || 0
+    const needed = Math.max(0, quota - existing)
+    
+    for (let j = 0; j < needed && videoId <= 10000; j++) {
+      const topic = videoTopics[Math.floor(Math.random() * videoTopics.length)]
+      const titleVariations = [
+        `${topic} Tutorial`,
+        `${topic} Explained`,
+        `Complete Guide to ${topic}`,
+        `Introduction to ${topic}`,
+        `${topic} for Beginners`,
+        `Advanced ${topic}`,
+        `Building with ${topic}`,
+        `${topic} Deep Dive`,
+        `Mastering ${topic}`,
+        `${topic} Best Practices`,
+        `Understanding ${topic}`,
+        `${topic} Development`,
+        `Getting Started with ${topic}`,
+        `${topic} Fundamentals`,
+        `${topic} Implementation`,
+      ]
+      const title = titleVariations[Math.floor(Math.random() * titleVariations.length)]
+      
+      const views = Math.floor(Math.random() * 1000000) + 100
+      const viewsStr = views >= 1000000 ? `${(views / 1000000).toFixed(1)}M` : views >= 1000 ? `${(views / 1000).toFixed(1)}K` : views.toString()
+      
+      const durationMinutes = Math.floor(Math.random() * 45) + 5
+      const durationSeconds = Math.floor(Math.random() * 60)
+      const duration = `${durationMinutes}:${String(durationSeconds).padStart(2, '0')}`
+      
+      const likes = Math.floor(views * (0.05 + Math.random() * 0.1))
+      const likesStr = likes >= 1000000 ? `${(likes / 1000000).toFixed(1)}M` : likes >= 1000 ? `${(likes / 1000).toFixed(1)}K` : likes.toString()
+      
+      const description = descriptions[Math.floor(Math.random() * descriptions.length)].replace('{topic}', topic.toLowerCase())
+      const thumbnail = thumbnails[Math.floor(Math.random() * thumbnails.length)]
+      const uploadDate = uploadDates[Math.floor(Math.random() * uploadDates.length)]
+
+      additionalVideos.push({
+        id: videoId++,
+        title,
+        creator: creator.name,
+        creatorId: creator.id,
+        thumbnail,
+        views: viewsStr,
+        duration,
+        avatar: creator.avatar,
+        description,
+        likes: likesStr,
+        uploadDate,
+      })
+    }
+  })
+  
+  // Generate new creators for remaining videos
+  const newCreatorNames = [
+    'Web3Builder', 'CryptoCreator', 'BlockchainDev', 'DeFiMaster', 'NFTArtist',
+    'SolidityExpert', 'EthereumPro', 'CryptoGuru', 'Web3Wizard', 'BlockchainNinja',
+    'DeFiDegen', 'NFTCrafter', 'CryptoAce', 'Web3Hero', 'BlockchainStar',
+    'DeFiTrader', 'CryptoKing', 'Web3Pioneer', 'BlockchainElite', 'DeFiVeteran',
+    'CryptoLegend', 'Web3Genius', 'BlockchainBoss', 'DeFiExpert', 'NFTSpecialist',
+    'CryptoMaster', 'Web3Champion', 'BlockchainPro', 'DeFiGuru', 'NFTCreator',
+    'CryptoWhale', 'Web3Warrior', 'BlockchainBeast', 'DeFiFarmer', 'NFTCollector',
+    'CryptoShark', 'Web3Explorer', 'BlockchainGuru', 'DeFiAnalyst', 'NFTHunter',
+    'CryptoInvestor', 'Web3Learner', 'BlockchainNewbie', 'DeFiNoob', 'CryptoEnthusiast',
+  ]
+  
+  // Generate remaining videos with new creators
+  while (videoId <= 10000) {
+    // Create a new creator if needed
+    if (newCreators.length < 50 && Math.random() > 0.7) {
+      const creatorName = newCreatorNames[newCreators.length % newCreatorNames.length]
+      newCreators.push({
+        name: creatorName,
+        id: creatorName.toLowerCase().replace(/\s+/g, ''),
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(creatorName)}`,
+      })
+    }
+    
+    // Use existing creator or new creator
+    const allCreators = [...creators, ...newCreators]
+    const creator = allCreators[Math.floor(Math.random() * allCreators.length)]
+    const topic = videoTopics[Math.floor(Math.random() * videoTopics.length)]
+    const titleVariations = [
+      `${topic} Tutorial`,
+      `${topic} Explained`,
+      `Complete Guide to ${topic}`,
+      `Introduction to ${topic}`,
+      `${topic} for Beginners`,
+      `Advanced ${topic}`,
+      `Building with ${topic}`,
+      `${topic} Deep Dive`,
+      `Mastering ${topic}`,
+      `${topic} Best Practices`,
+      `Understanding ${topic}`,
+      `${topic} Development`,
+      `Getting Started with ${topic}`,
+      `${topic} Fundamentals`,
+      `${topic} Implementation`,
+    ]
+    const title = titleVariations[Math.floor(Math.random() * titleVariations.length)]
+    
+    const views = Math.floor(Math.random() * 1000000) + 100
+    const viewsStr = views >= 1000000 ? `${(views / 1000000).toFixed(1)}M` : views >= 1000 ? `${(views / 1000).toFixed(1)}K` : views.toString()
+    
+    const durationMinutes = Math.floor(Math.random() * 45) + 5
+    const durationSeconds = Math.floor(Math.random() * 60)
+    const duration = `${durationMinutes}:${String(durationSeconds).padStart(2, '0')}`
+    
+    const likes = Math.floor(views * (0.05 + Math.random() * 0.1))
+    const likesStr = likes >= 1000000 ? `${(likes / 1000000).toFixed(1)}M` : likes >= 1000 ? `${(likes / 1000).toFixed(1)}K` : likes.toString()
+    
+    const description = descriptions[Math.floor(Math.random() * descriptions.length)].replace('{topic}', topic.toLowerCase())
+    const thumbnail = thumbnails[Math.floor(Math.random() * thumbnails.length)]
+    const uploadDate = uploadDates[Math.floor(Math.random() * uploadDates.length)]
+
+    additionalVideos.push({
+      id: videoId++,
+      title,
+      creator: creator.name,
+      creatorId: creator.id,
+      thumbnail,
+      views: viewsStr,
+      duration,
+      avatar: creator.avatar,
+      description,
+      likes: likesStr,
+      uploadDate,
+    })
+  }
+
+  return additionalVideos
+}
+
+// Combine existing videos with generated ones
+const generatedVideos = generateAdditionalVideos()
+export const allVideos: Video[] = [...videos, ...generatedVideos]
+
 export function getVideoById(id: number): Video | undefined {
-  return videos.find(v => v.id === id)
+  return allVideos.find(v => v.id === id)
 }
 
 export function getVideosByCreator(creatorId: string): Video[] {
-  return videos.filter(v => v.creatorId === creatorId)
+  const creatorVideos = allVideos.filter(v => v.creatorId === creatorId)
+  
+  // Limit videos to match profile video count
+  const creatorQuotas: { [key: string]: number } = {
+    'cryptodev': 12,
+    'blockchainmaster': 28,
+    'web3guru': 45,
+    'nftexpert': 19,
+    'defianalyst': 15,
+    'ethdeveloper': 52,
+    'securitypro': 23,
+    'polygonbuilder': 17,
+    'web3user': 5,
+  }
+  
+  const quota = creatorQuotas[creatorId.toLowerCase()]
+  if (quota) {
+    // Return only the first N videos up to the quota, sorted by ID (oldest first)
+    return creatorVideos
+      .sort((a, b) => a.id - b.id)
+      .slice(0, quota)
+  }
+  
+  // For new creators not in the quota list, return all their videos
+  return creatorVideos
 }
 

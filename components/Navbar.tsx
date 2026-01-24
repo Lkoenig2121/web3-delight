@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiMenu, FiUser, FiLogOut, FiX, FiPlay } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { videos } from "@/lib/videoData";
+import { allVideos as videos } from "@/lib/videoData";
 import { searchVideos, getMatchScore } from "@/lib/searchUtils";
 import VideoCard from "./VideoCard";
 
