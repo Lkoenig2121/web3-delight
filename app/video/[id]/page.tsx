@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import { useParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { FiThumbsUp, FiShare2, FiMoreVertical, FiLogOut } from 'react-icons/fi'
-import { getVideoById, allVideos as videos } from '@/lib/videoData'
-import { isSubscribed, toggleSubscription } from '@/lib/subscriptionUtils'
-import VideoPlayer from '@/components/VideoPlayer'
-import VideoCard from '@/components/VideoCard'
-import Comments from '@/components/Comments'
-import LoginModal from '@/components/LoginModal'
-import Link from 'next/link'
+import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FiThumbsUp, FiShare2, FiMoreVertical, FiLogOut } from "react-icons/fi";
+import { getVideoById, allVideos as videos } from "@/lib/videoData";
+import { isSubscribed, toggleSubscription } from "@/lib/subscriptionUtils";
+import VideoPlayer from "@/components/VideoPlayer";
+import VideoCard from "@/components/VideoCard";
+import Comments from "@/components/Comments";
+import LoginModal from "@/components/LoginModal";
+import Link from "next/link";
 
 export default function VideoPage() {
-  const params = useParams()
-  const videoId = parseInt(params.id as string)
-  const video = getVideoById(videoId)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [showLogin, setShowLogin] = useState(false)
-  const [subscribed, setSubscribed] = useState(false)
+  const params = useParams();
+  const videoId = parseInt(params.id as string);
+  const video = getVideoById(videoId);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem("token");
     if (token) {
-      fetch('/api/auth/me', {
+      fetch("/api/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -32,47 +32,49 @@ export default function VideoPage() {
         .then((res) => res.json())
         .then((data) => {
           if (data.id) {
-            setIsLoggedIn(true)
-            setUser(data)
+            setIsLoggedIn(true);
+            setUser(data);
           }
         })
         .catch(() => {
-          localStorage.removeItem('token')
-        })
+          localStorage.removeItem("token");
+        });
     }
-  }, [])
+  }, []);
 
   const handleLogin = (token: string, userData: any) => {
-    localStorage.setItem('token', token)
-    setIsLoggedIn(true)
-    setUser(userData)
-    setShowLogin(false)
-  }
+    localStorage.setItem("token", token);
+    setIsLoggedIn(true);
+    setUser(userData);
+    setShowLogin(false);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    setIsLoggedIn(false)
-    setUser(null)
-  }
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setUser(null);
+  };
 
   useEffect(() => {
     if (video) {
-      setSubscribed(isSubscribed(video.creatorId))
+      setSubscribed(isSubscribed(video.creatorId));
     }
-  }, [video])
+  }, [video]);
 
   const handleSubscribe = () => {
     if (video) {
-      const newState = toggleSubscription(video.creatorId)
-      setSubscribed(newState)
+      const newState = toggleSubscription(video.creatorId);
+      setSubscribed(newState);
     }
-  }
+  };
 
   if (!video) {
     return (
       <div className="min-h-screen animated-bg flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Video Not Found</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Video Not Found
+          </h1>
           <Link href="/">
             <motion.button
               whileHover={{ scale: 1.1 }}
@@ -84,11 +86,11 @@ export default function VideoPage() {
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   // Get related videos (excluding current video)
-  const relatedVideos = videos.filter(v => v.id !== video.id).slice(0, 4)
+  const relatedVideos = videos.filter((v) => v.id !== video.id).slice(0, 4);
 
   return (
     <main className="min-h-screen animated-bg">
@@ -113,7 +115,7 @@ export default function VideoPage() {
                 </span>
               </motion.div>
             </Link>
-            
+
             {/* User Actions */}
             <div className="flex items-center space-x-4">
               {isLoggedIn ? (
@@ -135,7 +137,7 @@ export default function VideoPage() {
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-                            user?.username || "default"
+                            user?.username || "default",
                           )}`;
                         }}
                       />
@@ -192,7 +194,9 @@ export default function VideoPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="glass rounded-xl p-6 border border-white/10"
             >
-              <h1 className="text-3xl font-bold text-white mb-4">{video.title}</h1>
+              <h1 className="text-3xl font-bold text-white mb-4">
+                {video.title}
+              </h1>
 
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -247,32 +251,38 @@ export default function VideoPage() {
                       }}
                     />
                     <div className="flex-1">
-                      <h3 className="text-white font-semibold text-lg hover:text-neon-cyan transition-colors">{video.creator}</h3>
-                      <p className="text-gray-400 text-sm">Web3 Content Creator</p>
+                      <h3 className="text-white font-semibold text-lg hover:text-neon-cyan transition-colors">
+                        {video.creator}
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Web3 Content Creator
+                      </p>
                     </div>
                   </motion.div>
                 </Link>
                 <motion.button
                   onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleSubscribe()
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSubscribe();
                   }}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   className={`px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all ml-auto ${
                     subscribed
-                      ? 'bg-gray-600 text-white hover:bg-gray-700'
-                      : 'bg-neon-cyan text-black hover:shadow-neon-cyan/50'
+                      ? "bg-gray-600 text-white hover:bg-gray-700"
+                      : "bg-neon-cyan text-black hover:shadow-neon-cyan/50"
                   }`}
                 >
-                  {subscribed ? 'Subscribed' : 'Subscribe'}
+                  {subscribed ? "Subscribed" : "Subscribe"}
                 </motion.button>
               </div>
 
               {/* Description */}
               <div className="mt-6 glass p-4 rounded-lg border border-white/10">
-                <p className="text-white leading-relaxed">{video.description}</p>
+                <p className="text-white leading-relaxed">
+                  {video.description}
+                </p>
               </div>
 
               {/* Comments Section */}
@@ -282,7 +292,9 @@ export default function VideoPage() {
 
           {/* Related Videos Sidebar */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-white mb-4">Related Videos</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Related Videos
+            </h2>
             {relatedVideos.map((relatedVideo) => (
               <motion.div
                 key={relatedVideo.id}
@@ -302,6 +314,5 @@ export default function VideoPage() {
         <LoginModal onClose={() => setShowLogin(false)} onLogin={handleLogin} />
       )}
     </main>
-  )
+  );
 }
-

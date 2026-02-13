@@ -71,6 +71,15 @@ body {
   background: rgba(0, 240, 255, 0.8);
 }
 
+/* Hide scrollbar for horizontal Shorts strip */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Animated background */
 @keyframes gradient {
   0% {

@@ -13,7 +13,27 @@ export interface Video {
   uploadDate: string
   videoUrl?: string
   category?: string
+  /** Human-readable name of the sample clip (matches actual playback) */
+  sampleLabel?: string
 }
+
+// Playable sample video URLs (public test streams)
+const SAMPLE_VIDEO_BASE = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/'
+const SAMPLE_VIDEO_FILES = [
+  'BigBuckBunny', 'ElephantsDream', 'ForBiggerBlazes', 'ForBiggerEscapes',
+  'ForBiggerFun', 'ForBiggerJoyrides', 'ForBiggerMeltdowns', 'Sintel',
+  'SubaruOutbackOnStreetAndDirt', 'TearsOfSteel', 'VolkswagenGTIReview',
+  'WeAreGoingOnBullrun', 'WhatCarCanYouGetForAGrand',
+]
+export const SAMPLE_VIDEO_URLS: string[] = SAMPLE_VIDEO_FILES.map(
+  (f) => SAMPLE_VIDEO_BASE + f + '.mp4'
+)
+export const SAMPLE_VIDEO_LABELS: string[] = [
+  'Big Buck Bunny', 'Elephants Dream', 'For Bigger Blazes', 'For Bigger Escapes',
+  'For Bigger Fun', 'For Bigger Joyrides', 'For Bigger Meltdowns', 'Sintel',
+  'Subaru Outback', 'Tears of Steel', 'Volkswagen GTI Review',
+  'We Are Going On Bullrun', 'What Car Can You Get For A Grand',
+]
 
 export type VideoCategory = 'All' | 'Solidity' | 'DeFi' | 'NFTs' | 'Security' | 'Layer 2' | 'Tools' | 'Advanced'
 
@@ -55,6 +75,25 @@ export function getVideosByCategory(category: VideoCategory): Video[] {
         return true
     }
   })
+}
+
+/** Derive category from video title/description so same topic → same sample clip */
+function getCategoryForVideo(video: { title: string; description: string }): VideoCategory {
+  const title = video.title.toLowerCase()
+  const desc = video.description.toLowerCase()
+  const t = (s: string) => title.includes(s) || desc.includes(s)
+  if (t('solidity') || t('erc-') || t('smart contract') || t('interface') || t('inheritance') || t('modifier')) return 'Solidity'
+  if (t('defi') || t('uniswap') || t('aave') || t('compound') || t('liquidity') || t('yield') || t('makerdao') || t('curve') || t('balancer')) return 'DeFi'
+  if (t('nft') || t('erc-721') || t('erc-1155') || t('minting') || t('opensea') || t('rarity') || t('generative') || t('royalties')) return 'NFTs'
+  if (t('security') || t('audit') || t('vulnerability') || t('reentrancy') || t('attack') || t('safe')) return 'Security'
+  if (t('polygon') || t('arbitrum') || t('optimism') || t('rollup') || t('zk') || t('starknet') || t('zksync') || t('plasma') || t('sidechain')) return 'Layer 2'
+  if (t('hardhat') || t('truffle') || t('foundry') || t('remix') || t('metamask') || t('wallet') || t('alchemy') || t('infura') || t('graph')) return 'Tools'
+  if (t('oracle') || t('dao') || t('bridge') || t('tokenomics') || t('proxy') || t('factory') || t('vesting') || t('multi-sig')) return 'Advanced'
+  return 'All'
+}
+
+const CATEGORY_TO_SAMPLE_INDEX: Record<VideoCategory, number> = {
+  'All': 0, 'Solidity': 1, 'DeFi': 2, 'NFTs': 3, 'Security': 4, 'Layer 2': 5, 'Tools': 6, 'Advanced': 7,
 }
 
 export const videos: Video[] = [
@@ -1211,9 +1250,18 @@ function generateAdditionalVideos(): Video[] {
   return additionalVideos
 }
 
-// Combine existing videos with generated ones
+// Combine existing videos with generated ones; assign URL and label by category so same topic → same clip
 const generatedVideos = generateAdditionalVideos()
-export const allVideos: Video[] = [...videos, ...generatedVideos]
+const combined: Video[] = [...videos, ...generatedVideos]
+export const allVideos: Video[] = combined.map((v) => {
+  const category = getCategoryForVideo(v)
+  const idx = CATEGORY_TO_SAMPLE_INDEX[category] % SAMPLE_VIDEO_URLS.length
+  return {
+    ...v,
+    videoUrl: SAMPLE_VIDEO_URLS[idx],
+    sampleLabel: SAMPLE_VIDEO_LABELS[idx],
+  }
+})
 
 export function getVideoById(id: number): Video | undefined {
   return allVideos.find(v => v.id === id)

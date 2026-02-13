@@ -1,94 +1,121 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { useState, useRef, useEffect } from 'react'
-import { FiPlay, FiPause, FiVolume2, FiVolumeX, FiMaximize, FiSettings } from 'react-icons/fi'
+import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import {
+  FiPlay,
+  FiPause,
+  FiVolume2,
+  FiVolumeX,
+  FiMaximize,
+  FiSettings,
+} from "react-icons/fi";
 
 interface VideoPlayerProps {
-  videoUrl?: string
-  thumbnail: string
-  title: string
+  videoUrl?: string;
+  thumbnail: string;
+  title: string;
+  /** Use vertical (9:16) aspect for shorts */
+  vertical?: boolean;
 }
 
 // Extract YouTube video ID from URL
 function getYouTubeVideoId(url: string): string | null {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
-  const match = url.match(regExp)
-  return match && match[2].length === 11 ? match[2] : null
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
 }
 
 // Check if URL is a YouTube URL
 function isYouTubeUrl(url: string): boolean {
-  return /youtube\.com|youtu\.be/.test(url)
+  return /youtube\.com|youtu\.be/.test(url);
 }
 
-export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
-  const [volume, setVolume] = useState(1)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
+export default function VideoPlayer({
+  videoUrl,
+  thumbnail,
+  title,
+  vertical,
+}: VideoPlayerProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration] = useState(120); // Simulated duration for preview (2 min)
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Check if it's a YouTube URL
-  const isYouTube = videoUrl && isYouTubeUrl(videoUrl)
-  const youtubeVideoId = videoUrl && isYouTube ? getYouTubeVideoId(videoUrl) : null
-  const embedUrl = youtubeVideoId ? `https://www.youtube.com/embed/${youtubeVideoId}?enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}` : null
+  const isYouTube = videoUrl && isYouTubeUrl(videoUrl);
+  const youtubeVideoId =
+    videoUrl && isYouTube ? getYouTubeVideoId(videoUrl) : null;
+  const embedUrl = youtubeVideoId
+    ? `https://www.youtube.com/embed/${youtubeVideoId}?enablejsapi=1&origin=${typeof window !== "undefined" ? window.location.origin : ""}`
+    : null;
 
-  // For demo purposes, we'll use a placeholder video or the thumbnail
-  const actualVideoUrl = videoUrl && !isYouTube ? videoUrl : 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+  // Web3 platform: use thumbnail-only "preview" for non-YouTube so we never show off-brand cartoon clips
+  const isPreviewMode = !isYouTube;
 
   useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    const updateTime = () => setCurrentTime(video.currentTime)
-    const updateDuration = () => setDuration(video.duration)
-
-    video.addEventListener('timeupdate', updateTime)
-    video.addEventListener('loadedmetadata', updateDuration)
-
-    return () => {
-      video.removeEventListener('timeupdate', updateTime)
-      video.removeEventListener('loadedmetadata', updateDuration)
+    if (!isPreviewMode) return;
+    if (isPlaying) {
+      previewTimerRef.current = setInterval(() => {
+        setCurrentTime((t) => {
+          if (t >= duration - 0.5) {
+            if (previewTimerRef.current) clearInterval(previewTimerRef.current);
+            previewTimerRef.current = null;
+            setIsPlaying(false);
+            return duration;
+          }
+          return t + 0.5;
+        });
+      }, 500);
+    } else {
+      if (previewTimerRef.current) {
+        clearInterval(previewTimerRef.current);
+        previewTimerRef.current = null;
+      }
     }
-  }, [])
+    return () => {
+      if (previewTimerRef.current) clearInterval(previewTimerRef.current);
+    };
+  }, [isPlaying, duration]);
 
   const togglePlay = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (isPlaying) {
-      video.pause()
+    if (isPreviewMode) {
+      if (!isPlaying && currentTime >= duration - 0.5) setCurrentTime(0);
+      setIsPlaying((p) => !p);
     } else {
-      video.play()
+      const video = videoRef.current;
+      if (video) {
+        if (isPlaying) video.pause();
+        else video.play().catch(() => {});
+      }
     }
-    setIsPlaying(!isPlaying)
-  }
+  };
 
-  const toggleMute = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    video.muted = !isMuted
-    setIsMuted(!isMuted)
-  }
+  const toggleMute = () => setIsMuted((m) => !m);
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const video = videoRef.current
-    if (!video) return
-
-    const newTime = parseFloat(e.target.value)
-    video.currentTime = newTime
-    setCurrentTime(newTime)
-  }
+    if (isPreviewMode) {
+      setCurrentTime(parseFloat(e.target.value));
+    } else {
+      const video = videoRef.current;
+      if (video) {
+        const newTime = parseFloat(e.target.value);
+        video.currentTime = newTime;
+        setCurrentTime(newTime);
+      }
+    }
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const aspectClass = vertical ? "aspect-[9/16]" : "aspect-video";
 
   // If YouTube URL, use iframe embed
   if (isYouTube && embedUrl) {
@@ -103,18 +130,38 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
           title={title}
         />
       </div>
-    )
+    );
   }
 
   return (
-    <div className="relative w-full aspect-video glass rounded-xl overflow-hidden border border-white/10 group">
-      <video
-        ref={videoRef}
-        src={actualVideoUrl}
-        poster={thumbnail}
-        className="w-full h-full object-cover"
-        onClick={togglePlay}
-      />
+    <div
+      className={`relative w-full ${aspectClass} glass rounded-xl overflow-hidden border border-white/10 group`}
+    >
+      {isPreviewMode ? (
+        <div
+          className="relative w-full h-full bg-black cursor-pointer"
+          onClick={togglePlay}
+        >
+          <img
+            src={thumbnail}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+          {isPlaying && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+          )}
+        </div>
+      ) : (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          poster={thumbnail}
+          className="w-full h-full object-cover"
+          onClick={togglePlay}
+          playsInline
+          preload="auto"
+        />
+      )}
 
       {/* Play/Pause Overlay */}
       {!isPlaying && (
@@ -122,7 +169,10 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
-          onClick={togglePlay}
+          onClick={(e) => {
+            e.stopPropagation();
+            togglePlay();
+          }}
         >
           <motion.div
             whileHover={{ scale: 1.1 }}
@@ -145,7 +195,7 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
             onChange={handleSeek}
             className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-neon-cyan"
             style={{
-              background: `linear-gradient(to right, #00f0ff 0%, #00f0ff ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) ${(currentTime / duration) * 100}%, rgba(255,255,255,0.2) 100%)`,
+              background: `linear-gradient(to right, #00f0ff 0%, #00f0ff ${duration ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.2) ${duration ? (currentTime / duration) * 100 : 0}%, rgba(255,255,255,0.2) 100%)`,
             }}
           />
         </div>
@@ -177,10 +227,10 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
                 step="0.01"
                 value={volume}
                 onChange={(e) => {
-                  const newVolume = parseFloat(e.target.value)
-                  setVolume(newVolume)
-                  if (videoRef.current) {
-                    videoRef.current.volume = newVolume
+                  const newVolume = parseFloat(e.target.value);
+                  setVolume(newVolume);
+                  if (!isPreviewMode && videoRef.current) {
+                    videoRef.current.volume = newVolume;
                   }
                 }}
                 className="w-20 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-neon-cyan"
@@ -211,8 +261,5 @@ export default function VideoPlayer({ videoUrl, thumbnail, title }: VideoPlayerP
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-
-

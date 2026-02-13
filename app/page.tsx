@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import VideoGrid from "@/components/VideoGrid";
 import Hero from "@/components/Hero";
+import ShortsSection from "@/components/ShortsSection";
 import LoginModal from "@/components/LoginModal";
 
 export default function Home() {
@@ -14,14 +15,14 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { scrollY } = useScroll();
-  
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Less aggressive fade on mobile - fade slower and less
@@ -112,6 +113,8 @@ export default function Home() {
       <motion.div style={{ opacity, y }}>
         <Hero />
       </motion.div>
+
+      <ShortsSection />
 
       <VideoGrid />
 
